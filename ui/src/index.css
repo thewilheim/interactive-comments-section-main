@@ -21,10 +21,10 @@ body {
   min-width: 320px;
   min-height: 100vh;
 
-  @apply flex w-full min-w-80 min-h-screen place-content-center bg-Light-gray
+  @apply w-full min-w-80 min-h-screen bg-Light-gray
 }
 
 
 #root{
-  @apply h-screen w-full
+  @apply h-screen w-full flex justify-center 
 }
