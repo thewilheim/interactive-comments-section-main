@@ -42,23 +42,16 @@ function App() {
               return (
                 <Comment
                   key={item.id}
-                  authorImage={item.user.image.png}
-                  authorName={item.user.username}
-                  commentText={item.content}
-                  postedDate={item.createdAt}
-                  userRatings={item.score}
+                  comment={item}
+                  parentId={item.id}
                 >
                   {item.replies.map((reply) => {
                     return (
                       <Comment
                         key={reply.id}
-                        authorImage={reply.user.image.png}
-                        authorName={reply.user.username}
-                        commentText={reply.content}
-                        postedDate={reply.createdAt}
-                        userRatings={reply.score}
-                        replyingTo={reply.replyingTo}
+                        comment={reply}
                         parentId={item.id}
+                        isReply={true}
                       />
                     );
                   })}

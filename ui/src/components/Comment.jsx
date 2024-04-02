@@ -2,25 +2,23 @@
 import { useContext, useState } from "react";
 import replyIcon from "../assets/icon-reply.svg";
 import UserRating from "./UserRating.jsx";
-import { AuthContext } from "../App.jsx";
+import { AuthContext, AppContext } from "../App.jsx";
 import editIcon from "../assets/icon-edit.svg"
 import deleteIcon from "../assets/icon-delete.svg"
 import AddComment from "./AddComment.jsx";
+import { deleteComment, removeComment } from "../utils/api.js";
 
 const Comment = (props) => {
 
   const {
-    authorImage,
-    authorName,
-    commentText,
-    postedDate,
-    userRatings,
-    children,
-    replyingTo,
-    parentId
+    comment,
+    isReply,
+    parentId,
+    children
   } = props;
 
   const currentUser = useContext(AuthContext);
+  const allComments = useContext(AppContext)
 
   const [replyingActive, setReplyingActive] = useState(false)
 
@@ -33,44 +31,44 @@ const Comment = (props) => {
   }
 
   const handleDelete = () => {
-
+    isReply ? removeComment(parentId, comment.id, allComments) : deleteComment(comment.id)
   }
 
   return (
     <>
       <div className="flex flex-col justify-between p-4 bg-white rounded-xl text-black shadow-lg my-2 md:relative md:my-4">
         <div className="flex flex-row items-center md:ml-20">
-          <img src={authorImage} alt="" className="w-10" />
-          {currentUser.username === authorName ? (
+          <img src={comment.user.image.png} alt="" className="w-10" />
+          {currentUser.username === comment.user.username ? (
             <p className="font-bold px-3">
-              {authorName}{" "}
+              {comment.user.username}{" "}
               <strong className="align-middle ml-1 px-2 py-0.5 text-white font-medium rounded bg-Moderate-blue">
                 you
               </strong>{" "}
             </p>
           ) : (
-            <p className="font-bold px-3">{authorName}</p>
+            <p className="font-bold px-3">{comment.user.username}</p>
           )}
-          <p className="text-black/70">{postedDate}</p>
+          <p className="text-black/70">{comment.createdAt}</p>
         </div>
-        {replyingTo ? (
+        {comment.replyingTo ? (
           <p className="py-4 text-black/70 md:ml-20">
-            <strong className="text-Moderate-blue">@{replyingTo}</strong>{" "}
-            {commentText}
+            <strong className="text-Moderate-blue">@{comment.replyingTo}</strong>{" "}
+            {comment.content}
           </p>
         ) : (
-          <p className="py-4 text-black/70 md:ml-20">{commentText}</p>
+          <p className="py-4 text-black/70 md:ml-20">{comment.content}</p>
         )}
         <div className="flex flex-row justify-between">
           <div className="md:absolute md:top-5">
-            <UserRating defaultRating={userRatings} />
+            <UserRating defaultRating={comment.score} />
           </div>
           <div className="flex flex-row justify-center items-center md:absolute md:right-6 md:top-5">
-          {currentUser.username === authorName ? (
+          {currentUser.username === comment.user.username ? (
             <>
               <div className="flex flex-row justify-center items-center mr-4">
                 <img src={deleteIcon} alt="" className="mr-2" />
-                <button className="font-bold text-red-500">Delete</button>
+                <button className="font-bold text-red-500" onClick={() => handleDelete()}>Delete</button>
               </div>
               <div className="flex flex-row justify-center items-center ">
                 <img src={editIcon} alt="" className="mr-2" />
@@ -88,7 +86,7 @@ const Comment = (props) => {
       </div>
       <div className="pl-12 border-l-4 ml-10 border-black/10">
       {replyingActive ? (
-        <AddComment isReply={true} replyingTo={replyingTo} parentId={parentId}/>
+        <AddComment isReply={true} replyingTo={comment.replyingTo} parentId={parentId}/>
       ) : null}
         {children}
       </div>
