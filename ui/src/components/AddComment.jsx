@@ -1,25 +1,62 @@
 /* eslint-disable react/prop-types */
-import { useContext, useState } from "react"
-import { AppContext, AuthContext } from "../App"
-import { addNewReply, addComment } from "../utils/api"
+import { useContext, useEffect, useState } from "react"
+import { AuthContext } from "../App"
+import { uid } from "uid"
+import moment from "moment"
 
 const AddComment = (props) => {
 
-  const { isReply, parentId, replyingTo } = props
+  const { isReply, parentComment, replyingTo, comment } = props
   
-  const currentUser = useContext(AuthContext)
-  const allComments = useContext(AppContext)
+  const {currentUser} = useContext(AuthContext)
 
   const [commentText, setCommentText] = useState("")
 
-  const handleReply = (e) => {
-    e.preventDefault()
-    addNewReply(commentText,currentUser,replyingTo,parentId,allComments)
+  const handleReply = () => {
+    const newReply = {
+      id: uid(),
+      content:commentText,
+      createdAt: moment().format('YYYY-MM-DD'),
+      replyingTo,
+      user: currentUser
+    }
+    parentComment.replies.push(newReply)
+
+    fetch(`http://localhost:3000/comments/${parentComment.id}`,{
+      method:"PUT",
+      body: JSON.stringify(parentComment)
+    }).then(res => {
+      if(res.ok){
+        console.log("Updated");
+      }
+    })
   }
 
   const handleComment = () => {
-    addComment(commentText, currentUser)
+      const newComment = {
+        id: uid(),
+        content:commentText,
+        createdAt: moment().local(),
+        user: currentUser,
+        replies:[],
+        score: 0
+      }
+
+    fetch(`http://localhost:3000/comments`,{
+      method:"POST",
+      body: JSON.stringify(newComment)
+    }).then(res => {
+      if(res.ok){
+        console.log("Updated");
+      }
+    })
   }
+
+  useEffect(() => {
+    if(comment){
+      setCommentText(comment.content)
+    }
+  },[comment])
 
   return (
     <div className='flex flex-col justify-between p-4 bg-white rounded-xl text-black shadow-lg my-4 md:relative'>
@@ -29,7 +66,7 @@ const AddComment = (props) => {
             </textarea>
             <div className="flex flex-row justify-between mb-2 md:mb-0">
             <img src={currentUser.image.png} alt="" className="w-10 h-10 md:absolute md:left-5 md:top-5 " />
-            <button className="bg-Moderate-blue p-1 px-6 rounded-lg text-white font-bold md:absolute md:right-3 md:top-5" onClick={ isReply ? handleReply : handleComment }>SEND</button>
+            <button className="bg-Moderate-blue p-1 px-6 rounded-lg text-white font-bold md:absolute md:right-3 md:top-5" onClick={ isReply ? handleReply : handleComment}>SEND</button>
             </div>
         </form>
   </div>

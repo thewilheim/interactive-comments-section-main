@@ -32,8 +32,8 @@ function App() {
   }, []);
 
   return (
-    <AuthContext.Provider value={currentUser}>
-      <AppContext.Provider value={allComments}>
+    <AuthContext.Provider value={{currentUser, setCurrentUser}}>
+      <AppContext.Provider value={{allComments, setAllComments}}>
       {loadingData ? (
         <div>Loading</div>
       ) : (
@@ -44,13 +44,14 @@ function App() {
                   key={item.id}
                   comment={item}
                   parentId={item.id}
+                  parentComment={item}
                 >
                   {item.replies.map((reply) => {
                     return (
                       <Comment
                         key={reply.id}
                         comment={reply}
-                        parentId={item.id}
+                        parentComment={item}
                         isReply={true}
                       />
                     );
