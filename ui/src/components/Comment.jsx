@@ -11,13 +11,10 @@ import DeleteModal from "./DeleteModal.jsx";
 
 const Comment = (props) => {
   const { comment, isReply, parentId, parentComment, children } = props;
-
   const { currentUser } = useContext(AuthContext);
-
   const [replyingActive, setReplyingActive] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-
   const [commentText, setCommentText] = useState(comment.content || "")
 
   const handleReply = () => {
@@ -32,7 +29,7 @@ const Comment = (props) => {
     if(isReply){
       const replyIndex = parentComment.replies.findIndex((item) => item.id === comment.id)
       parentComment.replies[replyIndex].content = commentText
-      fetch(`http://localhost:3000/comments/${parentComment.id}`, {
+      fetch(`${import.meta.env.VITE_URL}/comments/${parentComment.id}`, {
         method: "PUT",
         body: JSON.stringify(parentComment),
       }).then((res) => {
@@ -42,7 +39,7 @@ const Comment = (props) => {
       });
     } else {
       comment.content = commentText
-      fetch(`http://localhost:3000/comments/${comment.id}`, {
+      fetch(`import.meta.env.VITE_URL/comments/${comment.id}`, {
         method: "PUT",
         body: JSON.stringify(comment),
       }).then((res) => {
@@ -59,7 +56,7 @@ const Comment = (props) => {
   };
 
   const deleteComment = () => {
-    fetch(`http://localhost:3000/comments/${parentId}`, {
+    fetch(`${import.meta.env.VITE_URL}/comments/${parentId}`, {
       method: "DELETE",
     }).then((res) => {
       if (res.ok) {
@@ -74,7 +71,7 @@ const Comment = (props) => {
       (reply) => reply.id !== comment.id
     );
     parentComment.replies = updatedReplies;
-    fetch(`http://localhost:3000/comments/${parentComment.id}`, {
+    fetch(`${import.meta.env.VITE_URL}/comments/${parentComment.id}`, {
       method: "PUT",
       body: JSON.stringify(parentComment),
     }).then((res) => {

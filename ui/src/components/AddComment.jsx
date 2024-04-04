@@ -22,7 +22,7 @@ const AddComment = (props) => {
     }
     parentComment.replies.push(newReply)
 
-    fetch(`http://localhost:3000/comments/${parentComment.id}`,{
+    fetch(`${import.meta.env.VITE_URL}/comments/${parentComment.id}`,{
       method:"PUT",
       body: JSON.stringify(parentComment)
     }).then(res => {
@@ -42,7 +42,7 @@ const AddComment = (props) => {
         score: 0
       }
 
-    fetch(`http://localhost:3000/comments`,{
+    fetch(`${import.meta.env.VITE_URL}/comments`,{
       method:"POST",
       body: JSON.stringify(newComment)
     }).then(res => {
