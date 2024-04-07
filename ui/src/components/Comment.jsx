@@ -1,21 +1,30 @@
 /* eslint-disable react/prop-types */
 import moment from "moment"
-import { useContext, useState } from "react";
+import { useEffect, useState } from "react";
 import replyIcon from "../assets/icon-reply.svg";
 import UserRating from "./UserRating.jsx";
-import { AuthContext } from "../App.jsx";
 import editIcon from "../assets/icon-edit.svg";
 import deleteIcon from "../assets/icon-delete.svg";
 import AddComment from "./AddComment.jsx";
 import DeleteModal from "./DeleteModal.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { useGetUserDetailsQuery } from "../slices/userApiSlice.js"
+import { useUpdateCommentMutation, useGetCommentsQuery, useUpdateReplyMutation, useDeleteCommentMutation } from "../slices/commentSlice.js";
 
 const Comment = (props) => {
-  const { comment, isReply, parentId, parentComment, children } = props;
-  const { currentUser } = useContext(AuthContext);
+  const { comment, isReply, parentComment, children } = props;
+  const [author, setAuthor] = useState({})
   const [replyingActive, setReplyingActive] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [commentText, setCommentText] = useState(comment.content || "")
+
+  const { userInfo: currentUser } = useSelector((state) => state.auth);
+  const { refetch } = useGetCommentsQuery();
+  const [updateComment] = useUpdateCommentMutation()
+  const [updateReply] = useUpdateReplyMutation()
+
+  const {data: authorData, isLoading} = useGetUserDetailsQuery(comment.user)
 
   const handleReply = () => {
     setReplyingActive(!replyingActive);
@@ -25,29 +34,24 @@ const Comment = (props) => {
     setIsEditing(!isEditing);
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async (e) => {
+    e.preventDefault()
     if(isReply){
-      const replyIndex = parentComment.replies.findIndex((item) => item.id === comment.id)
-      parentComment.replies[replyIndex].content = commentText
-      fetch(`${import.meta.env.VITE_URL}/comments/${parentComment.id}`, {
-        method: "PUT",
-        body: JSON.stringify(parentComment),
-      }).then((res) => {
-        if (res.ok) {
-          setIsEditing(!isEditing)
-        }
-      });
+      try {
+        await updateReply({content:commentText, replyId: comment._id, _id:parentComment._id});
+        refetch()
+        setIsEditing(!isEditing)
+      } catch (error) {
+        console.log(error);
+      }
     } else {
-      comment.content = commentText
-      fetch(`import.meta.env.VITE_URL/comments/${comment.id}`, {
-        method: "PUT",
-        body: JSON.stringify(comment),
-      }).then((res) => {
-        if (res.ok) {
-          setIsEditing(!isEditing)
-          location.reload()
-        }
-      });
+      try {
+        await updateComment({content:commentText, _id:comment._id});
+        refetch()
+        setIsEditing(!isEditing)
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
@@ -55,56 +59,39 @@ const Comment = (props) => {
     setOpenDeleteModal(true);
   };
 
-  const deleteComment = () => {
-    fetch(`${import.meta.env.VITE_URL}/comments/${parentId}`, {
-      method: "DELETE",
-    }).then((res) => {
-      if (res.ok) {
-        setOpenDeleteModal(false);
-        location.reload();
-      }
-    });
-  };
-
-  const deleteReply = () => {
-    const updatedReplies = parentComment.replies.filter(
-      (reply) => reply.id !== comment.id
-    );
-    parentComment.replies = updatedReplies;
-    fetch(`${import.meta.env.VITE_URL}/comments/${parentComment.id}`, {
-      method: "PUT",
-      body: JSON.stringify(parentComment),
-    }).then((res) => {
-      if (res.ok) {
-        setOpenDeleteModal(false);
-        location.reload();
-      }
-    });
-  };
-
   const formatDate = (postedDate) => {
     return moment(postedDate).fromNow()
   }
+
+  useEffect(() => {
+    if(authorData){
+      setAuthor(authorData)
+    }
+  }, [authorData])
+
   return (
-    <>
+    isLoading ? (<p>loading</p>) : (
+      <>
       {openDeleteModal ? (
         <DeleteModal
-          deleteComment={isReply ? deleteReply : deleteComment}
+          commentId={comment._id}
+          isReply={isReply}
+          parentComment={parentComment}
           setOpenDeleteModal={setOpenDeleteModal}
         />
       ) : null}
       <div className="flex flex-col justify-between p-4 bg-white rounded-xl text-black shadow-lg my-2 md:relative md:my-4 min-h-36">
         <div className="flex flex-row items-center md:ml-20">
-          <img src={comment.user.image.png} alt="" className="w-10" />
-          {currentUser.username === comment.user.username ? (
+          <img src={""} alt="" className="w-10" />
+          {currentUser.username === author.username ? (
             <p className="font-bold px-3">
-              {comment.user.username}{" "}
+              {currentUser.username}{" "}
               <strong className="align-middle ml-1 px-2 py-0.5 text-white font-medium rounded bg-Moderate-blue">
                 you
               </strong>{" "}
             </p>
           ) : (
-            <p className="font-bold px-3">{comment.user.username}</p>
+            <p className="font-bold px-3">{author.username}</p>
           )}
           <p className="text-black/70">{formatDate(comment.createdAt)}</p>
         </div>
@@ -134,7 +121,7 @@ const Comment = (props) => {
             <UserRating defaultRating={comment.score} />
           </div>
           <div className="flex flex-row justify-center items-center">
-            {currentUser.username === comment.user.username ? (
+            {currentUser.username === author.username ? (
               isEditing ? (
                 <div className="md:h-10">
                 <button className=" md:absolute md:right-5 bg-Moderate-blue p-2 px-6 rounded-lg text-white font-bold" onClick={handleUpdate}>
@@ -181,13 +168,15 @@ const Comment = (props) => {
         {replyingActive ? (
           <AddComment
             isReply={true}
-            replyingTo={comment.user.username}
+            replyingTo={author.username}
             parentComment={parentComment}
+            setReplyingActive={setReplyingActive}
           />
         ) : null}
         {children}
       </div>
     </>
+    )
   );
 };
 

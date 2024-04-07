@@ -1,55 +1,38 @@
 /* eslint-disable react/prop-types */
-import { useContext, useEffect, useState } from "react"
-import { AuthContext } from "../App"
-import { uid } from "uid"
-import moment from "moment"
+import { useEffect, useState } from "react"
+import { useCreateCommentMutation, useGetCommentsQuery, useCreateReplyMutation} from "../slices/commentSlice.js";
 
 const AddComment = (props) => {
 
-  const { isReply, parentComment, replyingTo, comment } = props
-  
-  const {currentUser} = useContext(AuthContext)
+  const { isReply, parentComment, replyingTo, comment, setReplyingActive } = props
 
   const [commentText, setCommentText] = useState("")
 
-  const handleReply = () => {
-    const newReply = {
-      id: uid(),
-      content:commentText,
-      createdAt: moment().format('YYYY-MM-DD'),
-      replyingTo,
-      user: currentUser
-    }
-    parentComment.replies.push(newReply)
+  const {refetch} = useGetCommentsQuery()
+  const [createComment] = useCreateCommentMutation()
+  const [createReply] = useCreateReplyMutation()
 
-    fetch(`${import.meta.env.VITE_URL}/comments/${parentComment.id}`,{
-      method:"PUT",
-      body: JSON.stringify(parentComment)
-    }).then(res => {
-      if(res.ok){
-        console.log("Updated");
-      }
-    })
+  const handleReply = async (e) => {
+    e.preventDefault()
+    try {
+      await createReply({content:commentText, replyingTo, _id: parentComment._id});
+      refetch()
+      setCommentText("")
+      setReplyingActive(false)
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  const handleComment = () => {
-      const newComment = {
-        id: uid(),
-        content:commentText,
-        createdAt: moment().local(),
-        user: currentUser,
-        replies:[],
-        score: 0
-      }
-
-    fetch(`${import.meta.env.VITE_URL}/comments`,{
-      method:"POST",
-      body: JSON.stringify(newComment)
-    }).then(res => {
-      if(res.ok){
-        console.log("Updated");
-      }
-    })
+  const handleComment = async (e) => {
+    e.preventDefault()
+    try {
+      await createComment({content: commentText});
+      refetch()
+      setCommentText("")
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   useEffect(() => {
@@ -65,7 +48,7 @@ const AddComment = (props) => {
 
             </textarea>
             <div className="flex flex-row justify-between mb-2 md:mb-0">
-            <img src={currentUser.image.png} alt="" className="w-10 h-10 md:absolute md:left-5 md:top-5 " />
+            <img src={"currentUser.image.png"} alt="" className="w-10 h-10 md:absolute md:left-5 md:top-5 " />
             <button className="bg-Moderate-blue p-1 px-6 rounded-lg text-white font-bold md:absolute md:right-3 md:top-5" onClick={ isReply ? handleReply : handleComment}>SEND</button>
             </div>
         </form>
