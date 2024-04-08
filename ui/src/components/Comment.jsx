@@ -7,9 +7,9 @@ import editIcon from "../assets/icon-edit.svg";
 import deleteIcon from "../assets/icon-delete.svg";
 import AddComment from "./AddComment.jsx";
 import DeleteModal from "./DeleteModal.jsx";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useGetUserDetailsQuery } from "../slices/userApiSlice.js"
-import { useUpdateCommentMutation, useGetCommentsQuery, useUpdateReplyMutation, useDeleteCommentMutation } from "../slices/commentSlice.js";
+import { useUpdateCommentMutation, useGetCommentsQuery, useUpdateReplyMutation} from "../slices/commentSlice.js";
 
 const Comment = (props) => {
   const { comment, isReply, parentComment, children } = props;
@@ -82,7 +82,7 @@ const Comment = (props) => {
       ) : null}
       <div className="flex flex-col justify-between p-4 bg-white rounded-xl text-black shadow-lg my-2 md:relative md:my-4 min-h-36">
         <div className="flex flex-row items-center md:ml-20">
-          <img src={""} alt="" className="w-10" />
+          <img src={author.image} alt="" className="w-10 rounded-full" />
           {currentUser.username === author.username ? (
             <p className="font-bold px-3">
               {currentUser.username}{" "}

@@ -12,7 +12,7 @@ import { Provider } from "react-redux";
 import store from "./store.js";
 import { CommentScreen } from "./screens/CommentScreen.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
-import { RegisterScreen } from "./screens/RegisterScreen.jsx";
+import RegisterScreen from "./screens/RegisterScreen.jsx";
 import LoginScreen from "./screens/LoginScreen.jsx";
 
 const router = createBrowserRouter(

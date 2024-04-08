@@ -64,7 +64,6 @@ const deleteComment = asyncHandler(async (req, res) => {
 
 const createReply = asyncHandler(async (req, res) => {
   const { content, replyingTo } = req.body;
-  console.log(req.body);
 
   const comment = await Comment.findById(req.params.id);
 
@@ -100,7 +99,7 @@ const updateReply = asyncHandler(async (req, res) => {
           return reply
         }
       })
-      console.log(comment);
+
       const updateComment = await comment.save();
       res.json(updateComment);
     } else {
@@ -111,7 +110,7 @@ const updateReply = asyncHandler(async (req, res) => {
 
 const deleteReply = asyncHandler(async (req, res) => {
     const { replyId } = req.body;
-    console.log(req.params.id);
+
     const comment = await Comment.findById(req.params.id);
     if (comment) {
         const updatedReplies = comment.replies.filter(reply => reply.id !== replyId)

@@ -1,4 +1,4 @@
-import { USERS_URL } from '../../constrants.js';
+import { USERS_URL, UPLOAD_URL } from '../../constrants.js';
 import { apiSlice } from "./apiSlice";
 
 export const usersApiSlice = apiSlice.injectEndpoints({
@@ -12,7 +12,7 @@ export const usersApiSlice = apiSlice.injectEndpoints({
     }),
     register: builder.mutation({
       query: (data) => ({
-        url: `${USERS_URL}/register`,
+        url: USERS_URL,
         method: "POST",
         body: data,
       }),
@@ -43,6 +43,13 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
       keepUnusedDataFor: 5,
     }),
+    uploadUserImage: builder.mutation({
+      query: (data) => ({
+        url: UPLOAD_URL,
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -53,4 +60,5 @@ export const {
   useProfileMutation,
   useGetUsersQuery,
   useGetUserDetailsQuery,
+  useUploadUserImageMutation
 } = usersApiSlice;

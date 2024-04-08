@@ -26,5 +26,5 @@ body {
 
 
 #root{
-  @apply h-screen w-full flex justify-center 
+  @apply h-screen w-full flex justify-center items-center
 }

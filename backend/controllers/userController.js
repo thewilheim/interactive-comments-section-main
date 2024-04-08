@@ -9,7 +9,6 @@ import { genToken } from "../utils/genToken.js";
 const authUser = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
-  console.log(req.body);
 
   const user = await User.findOne({ username });
 

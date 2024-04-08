@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react"
 import { useCreateCommentMutation, useGetCommentsQuery, useCreateReplyMutation} from "../slices/commentSlice.js";
-
+import { useSelector } from "react-redux";
 const AddComment = (props) => {
 
   const { isReply, parentComment, replyingTo, comment, setReplyingActive } = props
@@ -11,6 +11,8 @@ const AddComment = (props) => {
   const {refetch} = useGetCommentsQuery()
   const [createComment] = useCreateCommentMutation()
   const [createReply] = useCreateReplyMutation()
+  
+  const { userInfo } = useSelector((state) => state.auth);
 
   const handleReply = async (e) => {
     e.preventDefault()
@@ -48,7 +50,7 @@ const AddComment = (props) => {
 
             </textarea>
             <div className="flex flex-row justify-between mb-2 md:mb-0">
-            <img src={"currentUser.image.png"} alt="" className="w-10 h-10 md:absolute md:left-5 md:top-5 " />
+            <img src={userInfo.image} alt="" className="w-10 h-10 md:absolute md:left-5 md:top-5 rounded-full" />
             <button className="bg-Moderate-blue p-1 px-6 rounded-lg text-white font-bold md:absolute md:right-3 md:top-5" onClick={ isReply ? handleReply : handleComment}>SEND</button>
             </div>
         </form>
