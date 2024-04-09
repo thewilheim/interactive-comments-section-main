@@ -5,7 +5,6 @@ import { useLogoutMutation } from "../slices/userApiSlice.js";
 import { logout } from "../slices/authSlice.js"
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import SkeletonComment from "../components/SkeletonComment.jsx";
 export const CommentScreen = () => {
     const { data:comments, isLoading } = useGetCommentsQuery();
     const dispatch = useDispatch()
@@ -23,7 +22,7 @@ export const CommentScreen = () => {
     }
   return (
     isLoading ? <>Loading</> : (
-        <div className="max-w-4xl">
+        <div className="max-w-4xl max-h-screen p-4">
         {comments.map((item) => {
           return (
             <Comment

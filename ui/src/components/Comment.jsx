@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { useGetUserDetailsQuery } from "../slices/userApiSlice.js"
 import { useUpdateCommentMutation, useGetCommentsQuery, useUpdateReplyMutation} from "../slices/commentSlice.js";
 import SkeletonComment from "./SkeletonComment.jsx";
+import placeholderImage from "../assets/placeholder-icon.svg"
 
 const Comment = (props) => {
   const { comment, isReply, parentComment, children } = props;
@@ -83,7 +84,7 @@ const Comment = (props) => {
       ) : null}
       <div className="flex flex-col justify-between p-4 bg-white rounded-xl text-black shadow-lg my-2 md:relative md:my-4 min-h-36">
         <div className="flex flex-row items-center md:ml-20">
-          <img src={author.image} alt="" className="w-10 rounded-full" />
+          <img src={author.image || placeholderImage} alt="" className="w-10 rounded-full" />
           {currentUser.username === author.username ? (
             <p className="font-bold px-3">
               {currentUser.username}{" "}
