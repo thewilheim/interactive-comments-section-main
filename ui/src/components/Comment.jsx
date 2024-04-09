@@ -10,6 +10,7 @@ import DeleteModal from "./DeleteModal.jsx";
 import { useSelector } from "react-redux";
 import { useGetUserDetailsQuery } from "../slices/userApiSlice.js"
 import { useUpdateCommentMutation, useGetCommentsQuery, useUpdateReplyMutation} from "../slices/commentSlice.js";
+import SkeletonComment from "./SkeletonComment.jsx";
 
 const Comment = (props) => {
   const { comment, isReply, parentComment, children } = props;
@@ -70,7 +71,7 @@ const Comment = (props) => {
   }, [authorData])
 
   return (
-    isLoading ? (<p>loading</p>) : (
+    isLoading ? <SkeletonComment /> : (
       <>
       {openDeleteModal ? (
         <DeleteModal
