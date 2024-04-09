@@ -99,10 +99,10 @@ const RegisterScreen = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <div>
+        {/* <div>
           <label htmlFor="">Upload an image</label>
           <input type="file" className="my-2" onChange={uploadFileHandler} />
-        </div>
+        </div> */}
         <button className="bg-Moderate-blue p-2 rounded-lg text-white font-bold w-full">
           Sign up
         </button>
